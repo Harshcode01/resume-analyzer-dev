@@ -1,149 +1,341 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import styles from "./Dashboard.module.css";
-import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import { Skeleton } from "@mui/material";
 import withAuthHOC from "../../utils/HOC/withAuthHOC";
-import axios from "../../utils/axios"
+import axios from "../../utils/axios";
 import { AuthContext } from "../../utils/AuthContext";
 
+const LOADING_STEPS = [
+  "01 // EXTRACTING RAW TEXT FROM PDF LAYERS...",
+  "02 // CROSS-REFERENCING JOB DESCRIPTION REQUIREMENTS...",
+  "03 // CALCULATING NEURAL ATS MATCH PROBABILITY...",
+];
 
 const Dashboard = () => {
-  const [uploadFiletext,setUploadFileText]=useState("upload your resume")
-  const [loading,setLoading]=useState(false)
-  const [resumeFile,setResumeFile]=useState(null)
-  const [jobDesc,setJobDesc]=useState("")
-  const [result,setResult]=useState(null)
-  const {userInfo}=useContext(AuthContext)
-  
-const handleOnChangeFile=(e)=>{
- setResumeFile(e.target.files[0]);
-  setUploadFileText(e.target.files[0].name)
- 
-}
+  const [uploadFileText, setUploadFileText] = useState(
+    "Drag & drop your PDF resume here, or click to browse"
+  );
+  const [fileSize, setFileSize] = useState(null);
+  const [fileError, setFileError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [jobDesc, setJobDesc] = useState("");
+  const [result, setResult] = useState(null);
+  const [animatedScore, setAnimatedScore] = useState(0);
 
-const handleUpload=async()=>{
-  setResult(null)
-  if(!jobDesc || !resumeFile){
-    alert("please fill job description & Upload resume");
-    return;
-  }
-  const formData=new FormData();
-  formData.append("resume",resumeFile)
-  formData.append("job_desc",jobDesc)
-  formData.append("user",userInfo._id)
+  const { userInfo } = useContext(AuthContext);
 
-//loading sckelton
+  useEffect(() => {
+    if (!loading) {
+      setStepIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setStepIndex((prev) => (prev < LOADING_STEPS.length - 1 ? prev + 1 : prev));
+    }, 1400);
+    return () => clearInterval(interval);
+  }, [loading]);
 
-setLoading(true)
+  useEffect(() => {
+    if (!result?.score) {
+      setAnimatedScore(0);
+      return;
+    }
+    const target = parseInt(result.score, 10) || 0;
+    let current = 0;
+    const step = Math.max(1, Math.ceil(target / 40));
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        setAnimatedScore(target);
+        clearInterval(timer);
+      } else {
+        setAnimatedScore(current);
+      }
+    }, 20);
+    return () => clearInterval(timer);
+  }, [result]);
 
+  const validateAndSetFile = (file) => {
+    if (!file) return;
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      setFileError("Invalid file format. Only PDF (.pdf) resumes are accepted.");
+      setResumeFile(null);
+      setFileSize(null);
+      setUploadFileText("Drag & drop your PDF resume here, or click to browse");
+      return;
+    }
+    setFileError("");
+    setResumeFile(file);
+    setUploadFileText(file.name);
+    setFileSize((file.size / 1024).toFixed(1) + " KB");
+  };
 
-  try{
-      const result=await  axios.post("/api/resume/addResume",formData)
-      setResult(result.data.data)
-      
+  const handleOnChangeFile = (e) => {
+    validateAndSetFile(e.target.files[0]);
+  };
 
-  }catch(err){
-    console.log(err);
-    
-  }finally{
-    setLoading(false)
-  }
-}
-   
-   
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    validateAndSetFile(e.dataTransfer.files[0]);
+  };
+
+  const handleUpload = async () => {
+    setResult(null);
+    if (!jobDesc.trim() || !resumeFile) {
+      setFileError("Please attach a PDF resume and paste the target Job Description.");
+      return;
+    }
+    setFileError("");
+
+    const formData = new FormData();
+    formData.append("resume", resumeFile);
+    formData.append("job_desc", jobDesc);
+    formData.append("user", userInfo._id);
+
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/resume/addResume", formData);
+      setResult(response.data.data);
+    } catch (err) {
+      console.log(err);
+      setFileError("Analysis failed. Check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const wordCount = jobDesc.trim() ? jobDesc.trim().split(/\s+/).length : 0;
+  const radius = 68;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset =
+    circumference - (animatedScore / 100) * circumference;
+
   return (
-    <div className={styles.Dashboard}>
-      <div className={styles.DashboardLeft}>
-        <div className={styles.DashboardHeader}>
-          <div className={styles.DashboardHeaderTitle}>
-            Smart Resume Screening{" "}
+    <main className={styles.Dashboard}>
+      <div className={styles.container}>
+        <div className={styles.pageBanner}>
+          <div>
+            <div className={styles.eyebrow}>ATS DIAGNOSTIC WORKSPACE</div>
+            <h1 className={styles.pageTitle}>Resume Match Analyzer</h1>
           </div>
-
-          <div className={styles.DashboardHeaderLargeTitle}>
-            Resume match score
+          <div className={styles.instructionPill}>
+            <span>01. Upload PDF Resume</span>
+            <span className={styles.divider}>/</span>
+            <span>02. Paste Complete Job Description</span>
+            <span className={styles.divider}>/</span>
+            <span>03. Run AI Scan</span>
           </div>
         </div>
 
-        <div className={styles.alertInfo}>
-          <div>🔔 Important Instuctions: </div>
-          <div className={styles.dashboardInstruction}>
-            <div>
-              📄 Please paste the complete job discription in the "Job
-              Description" field before submitting
+        <div className={styles.workspaceGrid}>
+          <section className={styles.inputPanel}>
+            <div className={styles.cardBlock}>
+              <div className={styles.cardHeaderRow}>
+                <span className={styles.stepTag}>STEP 01 // SOURCE DOCUMENT</span>
+                <span className={styles.formatBadge}>PDF ONLY</span>
+              </div>
+
+              <label
+                htmlFor="inputField"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`${styles.dropZone} ${
+                  isDragging ? styles.dropZoneActive : ""
+                } ${resumeFile ? styles.dropZoneReady : ""}`}
+              >
+                <input
+                  type="file"
+                  accept=".pdf"
+                  id="inputField"
+                  onChange={handleOnChangeFile}
+                />
+                <div className={styles.dropIconWrap}>
+                  {resumeFile ? (
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#34D399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  ) : (
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="12" y1="18" x2="12" y2="12" />
+                      <polyline points="9 15 12 12 15 15" />
+                    </svg>
+                  )}
+                </div>
+                <div className={styles.dropMeta}>
+                  <span className={styles.fileNameText}>{uploadFileText}</span>
+                  {fileSize ? (
+                    <span className={styles.fileSizeSub}>
+                      READY FOR PARSING • {fileSize}
+                    </span>
+                  ) : (
+                    <span className={styles.fileSizeSub}>
+                      Click to select or drag a .pdf file here
+                    </span>
+                  )}
+                </div>
+                <span className={styles.browseBtn}>
+                  {resumeFile ? "Change PDF" : "Upload Resume"}
+                </span>
+              </label>
+
+              {fileError && (
+                <div className={styles.errorBanner}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span>{fileError}</span>
+                </div>
+              )}
             </div>
-            <div>🔗 Only PDF format(.pdf) resumes are accepted</div>
-          </div>
-        </div>
 
-        <div className={styles.DashboardUploadResume}>
-          <div className={styles.DashboardResumeBlock}>{uploadFiletext}</div>
+            <div className={styles.cardBlock}>
+              <div className={styles.cardHeaderRow}>
+                <span className={styles.stepTag}>
+                  STEP 02 // TARGET JOB SPECIFICATION
+                </span>
+                <span className={styles.charCounter}>
+                  {wordCount} WORDS • {jobDesc.length} CHARS
+                </span>
+              </div>
 
-          <div className={styles.DashboardInputField}>
-            <label htmlFor="inputField" className={styles.analyzeAIBtn}>
-              Upload Resume
-            </label>
-            <input type="file" accept=".pdf" id="inputField" onChange={handleOnChangeFile}/>
-          </div>
-        </div>
+              <textarea
+                value={jobDesc}
+                onChange={(e) => setJobDesc(e.target.value)}
+                className={styles.textArea}
+                placeholder="Paste the complete job description, required tech stack, and responsibilities here..."
+                rows={9}
+              />
 
-        <div className={styles.jobDesc}>
-          <textarea
-          value={jobDesc}
-          onChange={(e)=>{setJobDesc(e.target.value)}}
-            className={styles.textArea}
-            placeholder="Paste Your Job Description"
-            rows={10}
-            cols={50}
-          />
-          <div className={styles.AnalyzeBtn} onClick={handleUpload}>Analyze</div>
+              <div className={styles.actionRow}>
+                <button
+                  type="button"
+                  onClick={handleUpload}
+                  disabled={loading}
+                  className={styles.analyzeBtn}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                  <span>{loading ? "SCANNING DOCUMENT..." : "Analyze Resume Match"}</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <aside className={styles.outputPanel}>
+            {loading && (
+              <div className={styles.diagnosticCard}>
+                <div className={styles.cardHeaderRow}>
+                  <span className={styles.stepTag}>NEURAL ENGINE ACTIVE</span>
+                  <span className={styles.livePulse}>PROCESSING</span>
+                </div>
+
+                <div className={styles.skeletonRingWrap}>
+                  <div className={styles.spinnerRing} />
+                </div>
+
+                <div className={styles.stepList}>
+                  {LOADING_STEPS.map((msg, idx) => (
+                    <div
+                      key={msg}
+                      className={`${styles.stepRow} ${
+                        idx <= stepIndex ? styles.stepRowActive : ""
+                      }`}
+                    >
+                      <span className={styles.stepDot} />
+                      <span>{msg}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {!loading && result && (
+              <div className={styles.diagnosticCard}>
+                <div className={styles.cardHeaderRow}>
+                  <span className={styles.stepTag}>DIAGNOSTIC REPORT</span>
+                  <span className={styles.statusComplete}>COMPLETE</span>
+                </div>
+
+                <div className={styles.scoreRingContainer}>
+                  <svg className={styles.progressSvg} width="170" height="170">
+                    <circle
+                      className={styles.progressTrack}
+                      cx="85"
+                      cy="85"
+                      r={radius}
+                    />
+                    <circle
+                      className={styles.progressValue}
+                      cx="85"
+                      cy="85"
+                      r={radius}
+                      style={{
+                        strokeDasharray: circumference,
+                        strokeDashoffset: strokeDashoffset,
+                      }}
+                    />
+                  </svg>
+                  <div className={styles.scoreCenterText}>
+                    <span className={styles.scoreNumber}>{animatedScore}%</span>
+                    <span className={styles.scoreSubLabel}>ATS MATCH</span>
+                  </div>
+                </div>
+
+                <div className={styles.fileTagBar}>
+                  <span>FILE: {result.resume_name || uploadFileText}</span>
+                </div>
+
+                <div className={styles.feedbackBox}>
+                  <div className={styles.feedbackTitle}>AI EXECUTIVE FEEDBACK</div>
+                  <p className={styles.feedbackBody}>{result.feedback}</p>
+                </div>
+              </div>
+            )}
+
+            {!loading && !result && (
+              <div className={styles.diagnosticCard}>
+                <div className={styles.cardHeaderRow}>
+                  <span className={styles.stepTag}>TELEMETRY STANDBY</span>
+                  <span className={styles.formatBadge}>READY</span>
+                </div>
+
+                <div className={styles.standbyBody}>
+                  <div className={styles.idleCircle}>
+                    <span>00%</span>
+                  </div>
+                  <h3>Awaiting Input</h3>
+                  <p>
+                    Upload your PDF resume and paste a target job description on
+                    the left to generate your ATS match score and tailored AI
+                    recommendations.
+                  </p>
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
       </div>
-
-      <div className={styles.DashboardRight}>
-        <div className={styles.DashboardRightTopCard}>
-          <div>Analyze with AI</div>
-
-          <img
-            className={styles.profileImg}
-            src={userInfo?.photoUrl}
-            referrerPolicy="no-referrer"
-            alt="Profile"
-            
-          />
-
-          <h2>{userInfo?.name}</h2>
-        </div>
-        {/*resume renser containt */}
-
-        {
-          result &&     <div className={styles.DashboardRightTopCard}>
-          <div>Result</div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 20,
-            }}
-          >
-            <h1>{result?.score}%</h1>
-            <CreditScoreIcon sx={{ fontSize: 22 }} />
-          </div>
-
-          <div className={styles.feedback}>
-            <h3>feedback</h3>
-            <p>{result?.feedback}</p>
-          </div>
-        </div>
-        }
-
-        {
-          loading && <Skeleton variant="rectangular" sx={{borderRadius:"20px"}} width={280} height={280} />
-        }
-      </div>
-    </div>
+    </main>
   );
 };
 
-export default withAuthHOC  (Dashboard);
+export default withAuthHOC(Dashboard);

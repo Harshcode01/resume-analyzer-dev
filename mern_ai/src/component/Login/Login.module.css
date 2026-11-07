@@ -1,50 +1,260 @@
-.Login {
+.HomePage {
+  position: relative;
+  width: 100vw;
+  min-height: 300vh;
+  background-color: #050807;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Fixed Top Navigation */
+.navbar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.2);
-  /* semi-transparant  */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  /* for safari */
-
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.loginCard{
-  background-color: black;
-  padding: 20px;
-  width: 30%;
-  border-radius: 20px;
-  color: white;
-}
-.loginCardTitle{
+  width: 100%;
+  height: 72px;
+  padding: 0 48px;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 20;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, transparent 100%);
 }
-.googleBtn{
-  padding: 20px;
-  box-sizing: border-box;
-  width: 100%;
-  background-color: white;
-  color: black;
-  border-radius: 30px;
-  font-size: 22px;
+
+.brand {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.brandDot {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 9999px;
+}
+
+.navBtnPrimary {
+  height: 40px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.navBtnPrimary:hover {
+  opacity: 0.88;
+}
+
+/* Scrollable Foreground Content */
+.scrollContent {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.heroSection {
+  height: 100vh;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0.55) 0%,
+    transparent 70%
+  );
+}
+
+.badge {
+  font-size: 12px;
+  color: #d1d5db;
+  border: 1px solid #374151;
+  background-color: rgba(10, 10, 10, 0.75);
+  padding: 6px 12px;
+  border-radius: 4px;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+.heroHeadline {
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -1px;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+}
+
+.heroSubtext {
+  font-size: 16px;
+  line-height: 24px;
+  color: #d1d5db;
+  max-width: 540px;
+  margin: 0 0 32px 0;
+}
+
+.ctaGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 20px;
+}
+
+.googleCtaBtn {
+  height: 48px;
+  padding: 0 24px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.googleCtaBtn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+.scrollHint {
+  font-size: 12px;
+  color: #d1d5db;
+  letter-spacing: 2px;
+  opacity: 0.75;
+}
+
+/* Story Cards Section */
+.storySection {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+}
+
+.storyGrid {
+  max-width: 1080px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.storyCard {
+  background-color: rgba(10, 10, 10, 0.88);
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stepIndex {
+  font-size: 12px;
+  color: #d1d5db;
+  letter-spacing: 1.5px;
+}
+
+.storyCard h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.storyCard p {
+  font-size: 14px;
+  line-height: 20px;
+  color: #d1d5db;
+  margin: 0;
+}
+
+/* Bottom Sign-Up Gate */
+.finalAuthSection {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.authBox {
+  width: 100%;
+  max-width: 420px;
+  background-color: #0a0a0a;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.authBox h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.authBox p {
+  font-size: 14px;
+  line-height: 20px;
+  color: #d1d5db;
+  margin: 0 0 8px 0;
+}
+
+.googleCtaBtnFull {
+  width: 100%;
+  height: 44px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   cursor: pointer;
 }
-@media screen and (max-width:780px) {
-  .loginCard{
-    width: 80%;
+
+.googleCtaBtnFull:hover {
+  opacity: 0.9;
+}
+
+@media screen and (max-width: 780px) {
+  .navbar {
+    padding: 0 20px;
   }
-  
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
 }

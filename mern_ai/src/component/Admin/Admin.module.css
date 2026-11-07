@@ -1,34 +1,170 @@
-.Admin{
-  flex: 0.8;
-  height: 100vh;
-  overflow: auto;
-  padding: 50px;
-  display: flex;
-  justify-content: space-between;
-  background-color: whitesmoke;
-  box-sizing: border-box;
- 
-}
-.AdminBlock{
+.Admin {
+  flex: 1;
   width: 100%;
-  display: grid;
-  gap: 20px;
-  grid-template-columns: 1fr 1fr 1fr 1fr ;
-}
-.AdminCard{
-  width: 100%;
-  
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  border-radius: 20px;
-  padding: 20px;
-  box-sizing: border-box;
+  padding: 40px 48px 80px 48px;
+  position: relative;
+  z-index: 10;
 }
 
-@media screen and  (max-width:780px){
-  .AdminBlock{
-    grid-template-columns: 1fr;
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-slate);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent-emerald);
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-slate);
+  border-radius: 6px;
+  padding: 8px 14px;
+  min-width: 360px;
+}
+
+.searchInput {
+  display: block !important;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.countPill {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--text-secondary);
+  border-left: 1px solid var(--border-slate);
+  padding-left: 10px;
+}
+
+.AdminBlock {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+.AdminCard {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-slate);
+  border-radius: 8px;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.AdminCard:hover {
+  transform: translateY(-3px);
+  border-color: #ffffff;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.candidateMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatarInitial {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.candidateName {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+}
+
+.candidateEmail {
+  font-size: 12px;
+  color: var(--accent-emerald);
+  margin: 0;
+}
+
+.scorePill {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-slate);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.fileRow {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-slate);
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+
+.feedbackBody {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+@media screen and (max-width: 780px) {
+  .Admin {
+    padding: 24px 16px 60px 16px;
   }
-  .Admin{
-    padding: 20px;
+  .searchBox {
+    min-width: 100%;
+  }
+  .AdminBlock {
+    grid-template-columns: 1fr;
   }
 }

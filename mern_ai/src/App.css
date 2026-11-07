@@ -1,17 +1,53 @@
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif ;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-deep: #050807;
+  --bg-card: rgba(10, 14, 13, 0.78);
+  --bg-card-hover: rgba(16, 23, 21, 0.9);
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-muted: #6B7280;
+  --border-slate: #273833;
+  --border-bright: #FFFFFF;
+  --accent-emerald: #34D399;
+  --error-red: #EF4444;
 }
-.App {
-  display: flex;
-  flex-shrink: 0;
+
+* {
   box-sizing: border-box;
 }
 
-@media screen and (max-width: 780px) {
-  .App {
-    flex-direction: column;
-  }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.App {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: 
+    radial-gradient(circle at 50% -10%, rgba(39, 56, 51, 0.45) 0%, transparent 60%),
+    radial-gradient(circle at 85% 90%, rgba(20, 32, 29, 0.4) 0%, transparent 50%),
+    #050807;
+}
+
+/* Subtle architectural grid overlay for inner pages */
+.App::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
 }
