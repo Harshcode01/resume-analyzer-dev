@@ -3,6 +3,7 @@ import styles from "./Admin.module.css";
 import { Skeleton } from "@mui/material";
 import withAuthHOC from "../../utils/HOC/withAuthHOC";
 import axios from "../../utils/axios";
+import { motion } from "framer-motion";
 
 const Admin = () => {
   const [data, setData] = useState([]);
@@ -75,7 +76,13 @@ const Admin = () => {
         ) : (
           <div className={styles.AdminBlock}>
             {filteredData.map((item, index) => (
-              <article key={item._id || index} className={styles.AdminCard}>
+              <motion.article
+                key={item._id || index}
+                className={styles.AdminCard}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 240, damping: 22, delay: Math.min(index, 12) * 0.05 }}
+              >
                 <div className={styles.cardHeader}>
                   <div className={styles.candidateMeta}>
                     <div className={styles.avatarInitial}>
@@ -98,7 +105,7 @@ const Admin = () => {
                 </div>
 
                 <p className={styles.feedbackBody}>{item.feedback}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
         )}

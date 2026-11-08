@@ -5,7 +5,7 @@
   width: 100%;
   height: 72px;
   padding: 0 48px;
-  background: rgba(5, 8, 7, 0.82);
+  background: rgba(5, 8, 7, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-slate);
@@ -49,7 +49,7 @@
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-slate);
   padding: 4px;
@@ -57,9 +57,7 @@
 }
 
 .navItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: relative;
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 600;
@@ -67,17 +65,31 @@
   color: var(--text-secondary);
   text-decoration: none;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .navItem:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
 }
 
-.activeNav {
-  background: #ffffff !important;
+.activeNavText {
   color: #050807 !important;
+}
+
+.activePillBg {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  border-radius: 4px;
+  z-index: 0;
+}
+
+.navItemContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .userSection {
@@ -148,7 +160,7 @@
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .logoutBtn:hover {
@@ -167,7 +179,8 @@
     padding-top: 12px;
     padding-bottom: 12px;
   }
-  .userMeta, .versionTag {
+  .userMeta,
+  .versionTag {
     display: none;
   }
 }

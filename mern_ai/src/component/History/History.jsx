@@ -4,6 +4,8 @@ import { Skeleton } from "@mui/material";
 import withAuthHOC from "../../utils/HOC/withAuthHOC";
 import axios from "../../utils/axios";
 import { AuthContext } from "../../utils/AuthContext";
+import { motion } from "framer-motion";
+import CountUp from "../Shared/CountUp";
 
 const History = () => {
   const [data, setData] = useState([]);
@@ -37,9 +39,13 @@ const History = () => {
     : 0;
 
   return (
-    <main className={styles.History}>
+    <motion.main
+      className={styles.History}
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className={styles.container}>
-        {/* Top Banner + Telemetry Stats */}
         <div className={styles.topHeader}>
           <div>
             <div className={styles.eyebrow}>PERSONAL SCAN ARCHIVE</div>
@@ -49,20 +55,19 @@ const History = () => {
           <div className={styles.statsRow}>
             <div className={styles.statBox}>
               <span className={styles.statLabel}>TOTAL SCANS</span>
-              <span className={styles.statValue}>{totalScans}</span>
+              <span className={styles.statValue}><CountUp to={totalScans} /></span>
             </div>
             <div className={styles.statBox}>
               <span className={styles.statLabel}>AVERAGE MATCH</span>
-              <span className={styles.statValue}>{avgScore}%</span>
+              <span className={styles.statValue}><CountUp to={avgScore} />%</span>
             </div>
             <div className={styles.statBox}>
               <span className={styles.statLabel}>PEAK SCORE</span>
-              <span className={styles.statValueAccent}>{bestScore}%</span>
+              <span className={styles.statValueAccent}><CountUp to={bestScore} />%</span>
             </div>
           </div>
         </div>
 
-        {/* Loading Skeletons */}
         {loader ? (
           <div className={styles.HistoryCardBlock}>
             {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -79,38 +84,49 @@ const History = () => {
           </div>
         ) : (
           <div className={styles.HistoryCardBlock}>
-            {data.map((item) => {
+            {data.map((item, idx) => {
               const numericScore = parseInt(item.score, 10) || 0;
               return (
-                <article key={item._id} className={styles.HistoryCard}>
+                <motion.article
+                  key={item._id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 240,
+                    damping: 22,
+                    delay: idx * 0.06,
+                  }}
+                  whileHover={{ y: -4 }}
+                  className={styles.HistoryCard}
+                >
                   <div className={styles.cardTop}>
                     <div>
                       <span className={styles.dateTag}>
                         DATED // {item.createdAt?.slice(0, 10)}
                       </span>
-                      <h3 className={styles.resumeTitle}>
-                        {item.resume_name}
-                      </h3>
+                      <h3 className={styles.resumeTitle}>{item.resume_name}</h3>
                     </div>
                     <div className={styles.scoreBadge}>{item.score}%</div>
                   </div>
 
-                  {/* Visual Score Progress Bar */}
                   <div className={styles.meterTrack}>
-                    <div
+                    <motion.div
                       className={styles.meterFill}
-                      style={{ width: `${Math.min(100, numericScore)}%` }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(100, numericScore)}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                     />
                   </div>
 
                   <p className={styles.feedbackText}>{item.feedback}</p>
-                </article>
+                </motion.article>
               );
             })}
           </div>
         )}
       </div>
-    </main>
+    </motion.main>
   );
 };
 
